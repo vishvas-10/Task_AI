@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 import os
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 load_dotenv()
 
 #create a database object not yet connected
@@ -10,6 +11,9 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+    )
     app.config['SECRET_KEY'] =os.getenv('SECRET_KEY')
     app.config['SESSION_COOKIE_HTTPONLY']=True
     is_prod = os.environ.get('FLASK_ENV') == 'production'
