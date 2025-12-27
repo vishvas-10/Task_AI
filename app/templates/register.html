@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Create an account</h1>
+      <p>Start organizing your work and life</p>
+    </div>
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        <label>Name</label>
+        {{ form.name(class="input") }}
+        {% for error in form.name.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        {{ form.email(class="input") }}
+        {% for error in form.email.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        {{ form.password(class="input") }}
+        {% for error in form.password.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label>Confirm Password</label>
+        {{ form.confirm_password(class="input") }}
+        {% for error in form.confirm_password.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}">Log in</a>
+    </div>
+  </div>
+
+</body>
+</html>

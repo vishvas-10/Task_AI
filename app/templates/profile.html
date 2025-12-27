@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{user.name}}</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/profile.css')}}">
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="user-section">
+            <div class="user-profile">
+                    <div class="user-avatar">{{user.initials}}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{user.name}}</div>
+                        <div class="user-email">{{ user.email }}</div>
+                    </div>
+            </div>
+            <div class="options">
+                <a href="{{ url_for('profile.change_password')}}"><div class="gradient-button">Update your password here.</div></a>
+                <form action="{{ url_for('auth.logout') }}" method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ form.submit(class="btn-power") }}
+                </form>
+            </div>
+            
+    </div>
+</body>
+</html>

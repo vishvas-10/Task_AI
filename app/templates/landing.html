@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskAI - Your Intelligent Task Manager</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <span>✨</span> TaskAI
+            </div><a href="{{ url_for('auth.login') }}"><button class="nav-btn">Sign In</button></a> 
+        </nav>
+
+        <section class="hero">
+            <div class="badge-pill">🚀 Powered by Advanced AI</div>
+            <h1>Work Smarter,<br>Not Harder</h1>
+            <p class="subtitle">Transform your productivity with AI that understands natural language, intelligently prioritizes tasks, and breaks down complex projects that require additional planning into actionable steps.</p>
+            <div class="cta-buttons">
+                <a href="{{url_for('auth.login')}}"><button class="cta-btn">Get Started Free</button></a>
+                
+                <!-- <button class="cta-btn secondary">Watch Demo</button> -->
+            </div>
+        </section>
+
+        <section class="showcase-section">
+            <div class="showcase-header">
+                <h2>See AI in Action</h2>
+                <p>Watch how TaskAI transforms a simple thought into an organized action plan</p>
+            </div>
+
+            <div class="demo-container">
+                <div class="input-demo">
+                    <div class="ai-icon">✨</div>
+                    <div>Plan my wedding for next summer</div>
+                </div>
+
+                <div class="task-breakdown">
+                    <div class="main-task">
+                        <h3>Plan wedding for next summer</h3>
+                        <p>Coordinate all aspects of wedding planning including venue, catering, guest list, and vendor management for a summer ceremony</p>
+                        <div class="task-meta">
+                            <span class="badge ai">✨ AI Generated</span>
+                            <span class="badge high">High Priority</span>
+                        </div>
+                    </div>
+
+                    <div class="subtasks-label">AI-Generated Subtasks</div>
+                    
+                    <div class="subtask">
+                        <h4>Research and book venue</h4>
+                        <div class="subtask-meta">
+                            <span class="badge high">High Importance</span>
+                            <span class="badge high">Urgent</span>
+                        </div>
+                    </div>
+
+                    <div class="subtask">
+                        <h4>Create guest list and send save-the-dates</h4>
+                        <div class="subtask-meta">
+                            <span class="badge high">High Importance</span>
+                            <span class="badge medium">Medium Urgency</span>
+                        </div>
+                    </div>
+
+                    <div class="subtask">
+                        <h4>Interview and book caterers</h4>
+                        <div class="subtask-meta">
+                            <span class="badge high">High Importance</span>
+                            <span class="badge medium">Medium Urgency</span>
+                        </div>
+                    </div>
+
+                    <div class="subtask">
+                        <h4>Select and order invitations</h4>
+                        <div class="subtask-meta">
+                            <span class="badge medium">Medium Importance</span>
+                            <span class="badge low">Low Urgency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Natural Language Processing</h3>
+                <p>Just type naturally. Our AI understands context, extracts details, and sets priorities automatically from your descriptions. No forms, no complexity.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Intelligent Prioritization</h3>
+                <p>AI analyzes importance and urgency to help you focus on what matters most. Never wonder what to tackle next.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Smart Task Breakdown</h3>
+                <p>Complex projects automatically break down into manageable subtasks with intelligent sequencing and dependencies.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 TaskAI. Making productivity effortless.</p>
+        </footer>
+    </div>
+</body>
+</html>

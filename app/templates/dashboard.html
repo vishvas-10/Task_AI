@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskAI - Dashboard</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    
+    <!-- Overlay for mobile when sidebar is open -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Toggle button - now INSIDE sidebar -->
+            <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+            
+            <div class="logo">
+                <span>✨</span>
+                <span>TaskAI</span>
+            </div>
+
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <div class="nav-item active">
+                        <span class="nav-icon">📋</span>
+                        <span>All Tasks</span>
+                    </div>
+                </div>
+            </nav>
+
+           <div class="user-section"> 
+            <a href="{{url_for('profile.profile')}}">
+                <div class="user-profile">
+                    <div class="user-avatar">{{user.initials}}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{user.name}}</div>
+                    </div>
+                </div>
+            
+        </a></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Good evening, {{user.first_name}} 👋</h1>
+                <p>You have {{ stats.active_tasks }} tasks to complete today</p>
+            </div>
+
+            <!-- AI Input Form -->
+            <form id = "taskForm" action="{{ url_for('tasks.add_task')}}" method="POST" class="ai-input-container">
+                {{ form.hidden_tag() }}
+                <div class="ai-icon">✨</div>
+                {{form.task(class = "ai-input")}}
+                {{form.submit(class="add-btn")}}
+            </form>
+
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid">
+                {% include '_stats_partial.html' %}
+            </div>
+
+            <!-- Tasks Section -->
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Tasks</h2>
+                    <div class="filter-tabs">
+                        <div class="filter-tabs">
+    <a href="{{ url_for('dashboard.dashboard', status='all') }}" 
+       class="filter-tab {% if request.view_args.get('status') == 'all' or not request.view_args.get('status') %}active{% endif %}">
+       All
+    </a>
+
+    <a href="{{ url_for('dashboard.dashboard', status='active') }}" 
+       class="filter-tab {% if request.view_args.get('status') == 'active' %}active{% endif %}">
+       Active
+    </a>
+
+    <a href="{{ url_for('dashboard.dashboard', status='completed') }}" 
+       class="filter-tab {% if request.view_args.get('status') == 'completed' %}active{% endif %}">
+       Completed
+    </a>
+</div>
+                    </div>
+                </div>
+
+                <div class="tasks-list" id="tasksList">
+                    
+                    
+                    {% for task in tasks if task.completed == False%}
+                    
+                    <div class="task-card {% if task.completed %}checked{% endif %}" data-task-id="{{ task.id }}">
+                        <div class="task-header">
+                            <div class="task-checkbox {% if task.completed %}checked{% endif %}" 
+                                 onclick="toggleTask({{ task.id }})"></div>
+                            
+                            <div class="task-content">
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.description %}
+                                <div class="task-description">{{ task.description }}</div>
+                                {% endif %}
+                                <div class="task-meta">
+                                    {% if task.ai_generated %}
+                                    <span class="badge ai">✨ AI Generated</span>
+                                    {% endif %}
+                                    {% if task.priority %}
+                                    <span class="badge {{ task.priority.lower() }}">{{ task.priority }} Priority</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if task.subtasks %}
+                                <div class="subtasks">
+                                    {% for subtask in task.subtasks %}
+                                    <div class="subtask-item" data-subtask-id="{{ subtask.id }}">
+                                        <div class="subtask-checkbox {% if subtask.completed %}checked{% endif %}"
+                                             onclick="toggleSubtask(event, {{ subtask.id }})"></div>
+                                        <div class="subtask-text">{{ subtask.title }}</div>
+                                        {% if subtask.importance %}
+                                        <span class="badge {{ subtask.importance.lower() }}">{{ subtask.importance }} Importance</span>
+                                        {% endif %}
+                                         {% if subtask.urgency %}
+                                        <span class="badge {{ subtask.urgency.lower() }}">{{ subtask.urgency }} Urgency</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="task-actions">
+                                <button class="delete-btn" onclick="deleteTask(event, {{ task.id }})" title="Delete task">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% endfor %}
+
+                    <!-- Render completed tasks at bottom -->
+                    {% for task in tasks if task.completed == True %}
+                    
+                    <div class="task-card {% if task.completed %}checked{% endif %}" data-task-id="{{ task.id }}">
+                        <div class="task-header">
+                            <div class="task-checkbox {% if task.completed %}checked{% endif %}" 
+                                 onclick="toggleTask({{ task.id }})"></div>
+                            
+                            <div class="task-content">
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.description %}
+                                <div class="task-description">{{ task.description }}</div>
+                                {% endif %}
+                                <div class="task-meta">
+                                    {% if task.ai_generated %}
+                                    <span class="badge ai">✨ AI Generated</span>
+                                    {% endif %}
+                                    {% if task.priority %}
+                                    <span class="badge {{ task.priority.lower() }}">{{ task.priority }} Priority</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if task.subtasks %}
+                                <div class="subtasks">
+                                    {% for subtask in task.subtasks %}
+                                    <div class="subtask-item" data-subtask-id="{{ subtask.id }}">
+                                        <div class="subtask-checkbox {% if subtask.completed %}checked{% endif %}"
+                                             onclick="toggleSubtask(event, {{ subtask.id }})"></div>
+                                        <div class="subtask-text">{{ subtask.title }}</div>
+                                        {% if subtask.importance %}
+                                        <span class="badge {{ subtask.importance.lower() }}">{{ subtask.importance }} Importance</span>
+                                        {% endif %}
+                                         {% if subtask.urgency %}
+                                        <span class="badge {{ subtask.urgency.lower() }}">{{ subtask.urgency }} Urgency</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="task-actions">
+                                <button class="delete-btn" onclick="deleteTask(event, {{ task.id }})" title="Delete task">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% endfor %}
+
+
+                    {% if not tasks %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No tasks yet</h3>
+                        <p>Start by adding your first task above</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+            
+            // Prevent body scroll when sidebar is open on mobile
+            if (sidebar.classList.contains('mobile-open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+        
+
+        
+        // Close sidebar when clicking outside on mobile
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                document.querySelector('.sidebar').classList.remove('mobile-open');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+
+
+
+        // Delete task function
+        function deleteTask(event, taskId) {
+            event.stopPropagation();
+            
+            if (confirm('Are you sure you want to delete this task?')) {
+                const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                
+                fetch('/delete-task', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ task_id: taskId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload()
+                        
+                    } else {
+                        alert('Failed to delete task: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting task:', error);
+                    alert('Failed to delete task');
+                });
+            }
+        }
+        
+
+
+        
+    function toggleTask(taskId) {
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const taskCard = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+    const checkbox = taskCard.querySelector('.task-checkbox');
+
+    // --- OPTIMISTIC UI ---
+    // Toggle classes immediately so it feels instant
+    const isNowChecked = !taskCard.classList.contains('checked');
+    taskCard.classList.toggle('checked', isNowChecked);
+    checkbox.classList.toggle('checked', isNowChecked);
+    
+    // Also toggle all subtask checkboxes inside this card
+    taskCard.querySelectorAll('.subtask-checkbox').forEach(cb => {
+        cb.classList.toggle('checked', isNowChecked);
+    });
+
+    fetch('/toggle-task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ task_id: taskId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // --- DYNAMIC CONTENT UPDATE ---
+            // Replace the entire stats grid with the new HTML from server
+            document.getElementById('statsGrid').innerHTML = data.stats_html;
+            
+            // Update the header text "You have X tasks..."
+            const headerCount = document.querySelector('.header p');
+            if (headerCount) {
+                headerCount.textContent = `You have ${data.active_count} tasks to complete today`;
+            }
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        // Rollback on error
+        taskCard.classList.toggle('checked');
+        checkbox.classList.toggle('checked');
+        alert("Sync failed. Reverting changes.");
+    });
+}
+        
+
+
+
+    // Toggle subtask completion
+function toggleSubtask(event, subtaskId) {
+    // 1. Prevent the parent task card from collapsing/expanding
+    event.stopPropagation();
+
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const subtaskItem = document.querySelector(`.subtask-item[data-subtask-id="${subtaskId}"]`);
+    const subtaskCheckbox = subtaskItem ? subtaskItem.querySelector('.subtask-checkbox') : null;
+
+    if (!subtaskItem || !subtaskCheckbox) return;
+
+    // 2. OPTIMISTIC UI: Toggle visual state immediately
+    const wasChecked = subtaskCheckbox.classList.contains('checked');
+    subtaskCheckbox.classList.toggle('checked');
+    subtaskItem.classList.toggle('completed-style'); 
+
+    // 3. SERVER REQUEST
+    fetch('/toggle-subtask', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ subtask_id: subtaskId })
+    })
+    .then(res => res.json()) // Parse the JSON from the server
+    .then(data => {
+        if (data.success) {
+            // 4. DYNAMIC CONTENT UPDATE
+            // Update the stats grid with the partial HTML
+            const statsGrid = document.getElementById('statsGrid');
+            if (statsGrid) {
+                statsGrid.innerHTML = data.stats_html;
+            }
+            
+            // Update the header text "You have X tasks..."
+            const headerCount = document.querySelector('.header p');
+            if (headerCount) {
+                headerCount.textContent = `You have ${data.active_count} tasks to complete today`;
+            }
+        } else {
+            throw new Error(data.error || "Toggle failed");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        // 5. ROLLBACK: Revert the UI if the request fails
+        subtaskCheckbox.classList.toggle('checked', wasChecked);
+        subtaskItem.classList.toggle('completed-style', wasChecked);
+        alert("Failed to update subtask. Please try again.");
+    });
+}
+        
+        // Expand/collapse subtasks on card click
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.task-card').forEach(card => {
+                const header = card.querySelector('.task-header');
+                const subtasks = card.querySelector('.subtasks');
+                
+                if (subtasks) {
+                    subtasks.style.maxHeight = subtasks.scrollHeight + 'px';
+                    
+                    header.addEventListener('click', (e) => {
+                        if (e.target.closest('.task-checkbox') || e.target.closest('.delete-btn')) return;
+                        
+                        const isExpanded = subtasks.style.maxHeight !== '0px';
+                        
+                        if (isExpanded) {
+                            subtasks.style.maxHeight = '0px';
+                            subtasks.style.opacity = '0';
+                            subtasks.style.marginTop = '0';
+                            subtasks.style.paddingTop = '0';
+                        } else {
+                            subtasks.style.maxHeight = subtasks.scrollHeight + 'px';
+                            subtasks.style.opacity = '1';
+                            subtasks.style.marginTop = '16px';
+                            subtasks.style.paddingTop = '16px';
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Add loading state to form submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            const button = form.querySelector('.add-btn');
+            const input = form.querySelector('.ai-input');
+            
+            button.textContent = 'Processing...';
+            button.style.opacity = '0.7';
+            button.disabled = true;
+            input.readOnly = true;
+        });
+        
+        // Filter tabs functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const filter = tab.textContent.toLowerCase();
+            });
+        });
+        
+        // Smooth scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+        
+    </script>
+</body>
+</html>
